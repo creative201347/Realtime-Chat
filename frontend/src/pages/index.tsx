@@ -2,9 +2,12 @@ import type { NextPage } from "next";
 import Head from "next/head";
 
 import { signIn, signOut, useSession } from "next-auth/react";
+import { Button, useColorMode } from "@chakra-ui/react";
 
 const Home: NextPage = () => {
   const { data } = useSession();
+  const { colorMode, toggleColorMode } = useColorMode();
+
   return (
     <div>
       <Head>
@@ -21,6 +24,9 @@ const Home: NextPage = () => {
       ) : (
         <button onClick={() => signIn("google")}>Signin</button>
       )}
+      <Button onClick={toggleColorMode}>
+        Toggle {colorMode === "light" ? "Dark" : "Light"}
+      </Button>
     </div>
   );
 };
