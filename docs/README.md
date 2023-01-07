@@ -1,5 +1,6 @@
 
 [Prisma Adapter](https://next-auth.js.org/adapters/prisma)
+| [Graphql Client](https://www.apollographql.com/docs/react/get-started)
 
 
 > [Theming](https://chakra-ui.com/docs/styled-system/theme) is where you define your application's color palette, type scale, font stacks, breakpoints, border radius values, and more.
