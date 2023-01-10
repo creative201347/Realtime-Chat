@@ -5,12 +5,12 @@ generator client {
 
 datasource db {
     provider = "mongodb"
-    url      = env("MONGODB_URI")
+    url      = "mongodb+srv://creative:201347@cluster0.c7vvxmp.mongodb.net/imessage-graphql?retryWrites=true&w=majority"
 }
 
 model Account {
     id                String  @id @default(auto()) @map("_id") @db.ObjectId
-    userId            String
+    userId            String  @db.ObjectId
     type              String
     provider          String
     providerAccountId String
@@ -30,7 +30,7 @@ model Account {
 model Session {
     id           String   @id @default(auto()) @map("_id") @db.ObjectId
     sessionToken String   @unique
-    userId       String
+    userId       String   @db.ObjectId
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
