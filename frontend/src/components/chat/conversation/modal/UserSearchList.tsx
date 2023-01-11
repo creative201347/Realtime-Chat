@@ -3,9 +3,13 @@ import { ISearchedUsers } from "../../../../types";
 
 interface UserSearchListProps {
   users: Array<ISearchedUsers>;
+  addParticipants: (user: ISearchedUsers) => void;
 }
 
-const UserSearchList: React.FC<UserSearchListProps> = ({ users }) => {
+const UserSearchList: React.FC<UserSearchListProps> = ({
+  users,
+  addParticipants,
+}) => {
   return (
     <>
       {users.length === 0 ? (
@@ -34,7 +38,7 @@ const UserSearchList: React.FC<UserSearchListProps> = ({ users }) => {
                   size="sm"
                   bg="brand.100"
                   _hover={{ bg: "brand.100" }}
-                  onClick={() => {}}
+                  onClick={() => addParticipants(user)}
                 >
                   Message
                 </Button>
