@@ -11,6 +11,10 @@
 | [Server Subscriptions](https://www.apollographql.com/docs/apollo-server/data/subscriptions)
 | [PubSub](https://www.apollographql.com/docs/apollo-server/data/subscriptions#the-pubsub-class)
 | [Filtering events](https://www.apollographql.com/docs/apollo-server/data/subscriptions/#filtering-events)
+
+
+[Migrating to Apollo V4](https://www.apollographql.com/docs/apollo-server/migration/#migrate-from-apollo-server-express)
+
 ```sh
 npx prisma generate --schema=src/prisma/schema.prisma
 

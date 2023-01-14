@@ -1,8 +1,11 @@
-import {
-  ApolloServerPluginDrainHttpServer,
-  ApolloServerPluginLandingPageLocalDefault,
-} from "apollo-server-core";
+import { ApolloServer } from "@apollo/server";
+import { ApolloServerPluginDrainHttpServer } from "@apollo/server/plugin/drainHttpServer";
+import { expressMiddleware } from "@apollo/server/express4";
+import express from "express";
+import cors from "cors";
+import { json } from "body-parser";
 
+import { createServer } from "http";
 import { makeExecutableSchema } from "@graphql-tools/schema";
 import { getSession } from "next-auth/react";
 import { PrismaClient } from "@prisma/client";
@@ -15,9 +18,6 @@ import { PubSub } from "graphql-subscriptions";
 import typeDefs from "./graphql/typeDefs";
 import resolvers from "./graphql/resolvers";
 
-import express from "express";
-import { createServer } from "http";
-import { ApolloServer } from "apollo-server-express";
 import { IGraphqlContext, ISession, ISubscriptionContext } from "./types";
 
 async function main() {
@@ -58,19 +58,9 @@ async function main() {
     wsServer
   );
 
-  const corsOptions = {
-    origin: process.env.BASE_URL || "http://localhost:3000",
-    credentials: true,
-  };
-
   const server = new ApolloServer({
     schema,
     csrfPrevention: true,
-    cache: "bounded",
-    context: async ({ req, res }): Promise<IGraphqlContext> => {
-      const session = (await getSession({ req })) as ISession;
-      return { session, prisma, pubsub };
-    },
     plugins: [
       /*------- Proper shutdown for the HTTP server --------*/
       ApolloServerPluginDrainHttpServer({ httpServer }),
@@ -83,16 +73,30 @@ async function main() {
           };
         },
       },
-      /*-------- Proper shutdown for the WebSocket server --------*/
-      ApolloServerPluginLandingPageLocalDefault({ embed: true }),
     ],
   });
 
   await server.start();
-  server.applyMiddleware({ app, cors: corsOptions });
+
+  const corsOptions = {
+    origin: process.env.BASE_URL || "http://localhost:3000",
+    credentials: true,
+  };
+  app.use(
+    "/graphql",
+    cors<cors.CorsRequest>(corsOptions),
+    json(),
+    expressMiddleware(server, {
+      context: async ({ req }): Promise<IGraphqlContext> => {
+        const session = await getSession({ req });
+        return { session: session as ISession, prisma, pubsub };
+      },
+    })
+  );
+
   await new Promise<void>((resolve) =>
     httpServer.listen({ port: 4000 }, resolve)
   );
-  console.log(`http://localhost:4000${server.graphqlPath}`);
+  console.log(`http://localhost:4000/graphql`);
 }
 main().catch((err) => console.log(err));
