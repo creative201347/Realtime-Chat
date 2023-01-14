@@ -1,8 +1,51 @@
 import { Prisma } from "@prisma/client";
 import { ApolloError } from "apollo-server-core";
-import { IGraphqlContext } from "../../types";
+import { ConversationPopulated, IGraphqlContext } from "../../types";
 
 const resolvers = {
+  Query: {
+    conversations: async (
+      _: any,
+      __: any,
+      context: IGraphqlContext
+    ): Promise<Array<ConversationPopulated>> => {
+      const { session, prisma } = context;
+
+      if (!session?.user) {
+        throw new ApolloError("Not Authorized");
+      }
+
+      const {
+        user: { id: userId },
+      } = session;
+
+      try {
+        const conversations = await prisma.conversation.findMany({
+          /*
+          where: {
+            participants: {
+              some: {
+                userId: {
+                  equals: userId,
+                },
+              },
+            },
+          },
+          */
+          include: conversationPopulated,
+        });
+
+        /*----------- Since there is bug in above code --------------*/
+        return conversations.filter(
+          (conversation) =>
+            !!conversation.participants.find((p) => p.userId === userId)
+        );
+      } catch (error: any) {
+        console.log("Conversation error", error);
+        throw new ApolloError(error?.message);
+      }
+    },
+  },
   Mutation: {
     createConversation: async (
       _: any,
@@ -48,7 +91,7 @@ const resolvers = {
   },
 };
 
-export const participantPopulates =
+export const participantPopulated =
   Prisma.validator<Prisma.ConversationParticipantInclude>()({
     user: {
       select: {
@@ -60,7 +103,7 @@ export const participantPopulates =
 export const conversationPopulated =
   Prisma.validator<Prisma.ConversationInclude>()({
     participants: {
-      include: participantPopulates,
+      include: participantPopulated,
     },
     latestMessage: {
       include: {

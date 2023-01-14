@@ -1,3 +1,5 @@
+import { ConversationPopulated } from "../../../backend/src/types";
+
 export interface ICreateUsernameData {
   createUsername: {
     success: boolean;
@@ -29,4 +31,9 @@ export interface ICreateConversationData {
 }
 export interface ICreateConversationInput {
   participantsIds: Array<string>;
+}
+
+/*----------- Conversations ------------*/
+export interface IConversationsData {
+  conversations: Array<ConversationPopulated>;
 }
