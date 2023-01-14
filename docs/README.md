@@ -6,6 +6,7 @@
 | [Next Auth Callbacks](https://next-auth.js.org/configuration/callbacks)
 | [React hot Toast](https://react-hot-toast.com/)
 | [Chakra Modals](https://chakra-ui.com/docs/components/modal)
+| [Prisma Mongodb](https://www.prisma.io/dataguide#mongodb)
 
 ```sh
 npx prisma generate --schema=src/prisma/schema.prisma
