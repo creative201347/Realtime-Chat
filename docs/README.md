@@ -14,6 +14,7 @@
 
 
 [Migrating to Apollo V4](https://www.apollographql.com/docs/apollo-server/migration/#migrate-from-apollo-server-express)
+| [Npm Update](https://stackoverflow.com/questions/16073603/how-to-update-each-dependency-in-package-json-to-the-latest-version)
 
 ```sh
 npx prisma generate --schema=src/prisma/schema.prisma
