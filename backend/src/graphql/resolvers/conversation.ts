@@ -1,5 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { ApolloError } from "apollo-server-core";
+import { withFilter } from "graphql-subscriptions";
 import { ConversationPopulated, IGraphqlContext } from "../../types";
 
 const resolvers = {
@@ -52,7 +53,7 @@ const resolvers = {
       args: { participantsIds: Array<string> },
       context: IGraphqlContext
     ): Promise<{ conversationId: string }> => {
-      const { session, prisma } = context;
+      const { session, prisma, pubsub } = context;
       const { participantsIds } = args;
 
       if (!session?.user) {
@@ -79,7 +80,9 @@ const resolvers = {
         });
 
         // EMIT CONVERSATION CREATED EVENT USING PUBSUB
-
+        pubsub.publish("CONVERSATION_CREATED", {
+          conversationCreated: conversation,
+        });
         return {
           conversationId: conversation.id,
         };
@@ -89,7 +92,43 @@ const resolvers = {
       }
     },
   },
+  Subscription: {
+    conversationCreated: {
+      // subscribe: (_: any, __: any, context: IGraphqlContext) => {
+      //   const { pubsub } = context;
+      //   return pubsub.asyncIterator(['CONVERSATION_CREATED"']);
+      // },
+      /*----------Filtering Events ------------*/
+      subscribe: withFilter(
+        (_: any, __: any, context: IGraphqlContext) => {
+          const { pubsub } = context;
+
+          return pubsub.asyncIterator(['CONVERSATION_CREATED"']);
+        },
+        (
+          payload: IConversationCreatedSubscriptionPayload,
+          _,
+          context: IGraphqlContext
+        ) => {
+          const { session } = context;
+          const {
+            conversationCreated: { participants },
+          } = payload;
+
+          const userIsParticipant = !!participants.find(
+            (p) => p.userId === session?.user.id
+          );
+
+          return userIsParticipant;
+        }
+      ),
+    },
+  },
 };
+
+export interface IConversationCreatedSubscriptionPayload {
+  conversationCreated: ConversationPopulated;
+}
 
 export const participantPopulated =
   Prisma.validator<Prisma.ConversationParticipantInclude>()({

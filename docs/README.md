@@ -10,11 +10,13 @@
 | [Client Subscriptions](https://www.apollographql.com/docs/react/data/subscriptions/)
 | [Server Subscriptions](https://www.apollographql.com/docs/apollo-server/data/subscriptions)
 | [PubSub](https://www.apollographql.com/docs/apollo-server/data/subscriptions#the-pubsub-class)
+| [Filtering events](https://www.apollographql.com/docs/apollo-server/data/subscriptions/#filtering-events)
 ```sh
 npx prisma generate --schema=src/prisma/schema.prisma
 
 npx prisma generate --schema=src/prisma/schema.prisma
 ```
+
 
 
 > [Theming](https://chakra-ui.com/docs/styled-system/theme) is where you define your application's color palette, type scale, font stacks, breakpoints, border radius values, and more.

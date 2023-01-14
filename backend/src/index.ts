@@ -16,24 +16,27 @@ import typeDefs from "./graphql/typeDefs";
 import resolvers from "./graphql/resolvers";
 
 import express from "express";
-import http from "http";
+import { createServer } from "http";
 import { ApolloServer } from "apollo-server-express";
 import { IGraphqlContext, ISession, ISubscriptionContext } from "./types";
 
 async function main() {
-  const app = express();
   dotenv.config();
 
-  const httpServer = http.createServer(app);
-
-  const wsServer = new WebSocketServer({
-    server: httpServer,
-    path: "/graphql",
-  });
-
+  // Create the schema, which will be used separately by ApolloServer and the WebSocket server.
   const schema = makeExecutableSchema({
     typeDefs,
     resolvers,
+  });
+
+  // Create an Express app and HTTP server; we will attach both the WebSocket server and the ApolloServer to this HTTP server.
+  const app = express();
+  const httpServer = createServer(app);
+
+  // Create our WebSocket server using the HTTP server we just set up.
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: "/graphql/subscriptions",
   });
 
   /*---------- Context Parameters ----------*/
