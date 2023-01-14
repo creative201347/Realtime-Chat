@@ -7,7 +7,9 @@
 | [React hot Toast](https://react-hot-toast.com/)
 | [Chakra Modals](https://chakra-ui.com/docs/components/modal)
 | [Prisma Mongodb](https://www.prisma.io/dataguide#mongodb)
-
+| [Client Subscriptions](https://www.apollographql.com/docs/react/data/subscriptions/)
+| [Server Subscriptions](https://www.apollographql.com/docs/apollo-server/data/subscriptions)
+| [PubSub](https://www.apollographql.com/docs/apollo-server/data/subscriptions#the-pubsub-class)
 ```sh
 npx prisma generate --schema=src/prisma/schema.prisma
 

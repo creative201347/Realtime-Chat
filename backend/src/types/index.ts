@@ -4,19 +4,26 @@ import {
   conversationPopulated,
   participantPopulated,
 } from "../graphql/resolvers/conversation";
+import { Context } from "graphql-ws/lib/server";
+import { PubSub } from "graphql-subscriptions";
 
+/*----------- Server Configuration ------------*/
 export interface IGraphqlContext {
   session: ISession | null;
   prisma: PrismaClient;
-  // pubsub
+  pubsub: PubSub;
 }
-
-/* ------- Users------- */
 export interface ISession {
   user: IUser;
   expires: ISODateString;
 }
+export interface ISubscriptionContext extends Context {
+  connectionParams: {
+    session?: ISession;
+  };
+}
 
+/* ------- Users------- */
 export interface IUser {
   id: string;
   username: string;
