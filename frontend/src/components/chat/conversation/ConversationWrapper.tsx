@@ -5,8 +5,8 @@ import ConversationList from "./ConversationList";
 import ConversationOperations from "../../../graphql/operations/conversation";
 import { useQuery } from "@apollo/client";
 import { IConversationsData } from "../../../types";
-import { ConversationPopulated } from "../../../../../backend/src/types";
 import { useEffect } from "react";
+import { useRouter } from "next/router";
 
 interface ConversationWrapperProps {
   session: Session;
@@ -24,7 +24,14 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
     ConversationOperations.Queries.conversations
   );
 
-  console.log("QUERY DATA", conversationData);
+  const router = useRouter();
+  const { conversationId } = router.query;
+
+  const onViewConversation = async (conversationId: string) => {
+    // 1. Push the new conversationId to the router query params
+    router.push({ query: { conversationId } });
+    // 2. Mark the conversation as read
+  };
 
   const subscribeToNewConversations = () => {
     subscribeToMore({
@@ -52,11 +59,19 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
   }, []);
 
   return (
-    <Box width={{ base: "100%", md: "400px" }} bg="whiteAlpha.50" py={6} px={3}>
+    <Box
+      display={{ base: conversationId ? "none" : "flex", md: "flex" }}
+      overflow="hidden"
+      width={{ base: "100%", md: "400px" }}
+      bg="whiteAlpha.50"
+      py={6}
+      px={3}
+    >
       {/* Skeleton Loader  */}
       <ConversationList
         session={session}
         conversations={conversationData?.conversations || []}
+        onViewConversation={onViewConversation}
       />
     </Box>
   );
