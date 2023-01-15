@@ -4,6 +4,7 @@ import { toast } from "react-hot-toast";
 
 import MessagesOperation from "../../../../graphql/operations/message";
 import { IMessagesData, IMessagesVariables } from "../../../../types";
+import SkeletonLoader from "../../../common/SkeletonLoader";
 
 interface MessagesProps {
   userId: string;
@@ -26,9 +27,9 @@ const Messages: React.FC<MessagesProps> = ({ userId, conversationId }) => {
   console.log("MESSAGES DATA", data);
   return (
     <Flex direction="column" justify="flex-end" overflow="hidden">
-      {loading && (
-        <Stack>
-          {/* <SkeletonLoader count={4} height="60px" width="100%" /> */}
+      {true && (
+        <Stack spacing={4} px={4}>
+          <SkeletonLoader count={4} height="60px" width="100%" />
           <span>LOADING MESSAGES...</span>
         </Stack>
       )}

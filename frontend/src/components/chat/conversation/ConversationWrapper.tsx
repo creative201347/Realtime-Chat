@@ -7,6 +7,7 @@ import { useQuery } from "@apollo/client";
 import { IConversationsData } from "../../../types";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import SkeletonLoader from "../../common/SkeletonLoader";
 
 interface ConversationWrapperProps {
   session: Session;
@@ -61,18 +62,22 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
   return (
     <Box
       display={{ base: conversationId ? "none" : "flex", md: "flex" }}
-      overflow="hidden"
       width={{ base: "100%", md: "400px" }}
+      flexDirection="column"
+      gap={4}
       bg="whiteAlpha.50"
       py={6}
       px={3}
     >
-      {/* Skeleton Loader  */}
-      <ConversationList
-        session={session}
-        conversations={conversationData?.conversations || []}
-        onViewConversation={onViewConversation}
-      />
+      {conversationLoading ? (
+        <SkeletonLoader count={7} height="80px" width="100%" />
+      ) : (
+        <ConversationList
+          session={session}
+          conversations={conversationData?.conversations || []}
+          onViewConversation={onViewConversation}
+        />
+      )}
     </Box>
   );
 };
