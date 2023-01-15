@@ -8,6 +8,7 @@ import { IConversationsData } from "../../../types";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import SkeletonLoader from "../../common/SkeletonLoader";
+import { ConversationPopulated } from "../../../../../backend/src/types";
 
 interface ConversationWrapperProps {
   session: Session;
@@ -17,9 +18,9 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
   session,
 }) => {
   const {
-    data: conversationData,
-    error: conversationError,
-    loading: conversationLoading,
+    data: conversationsData,
+    error: conversationsError,
+    loading: conversationsLoading,
     subscribeToMore,
   } = useQuery<IConversationsData, null>(
     ConversationOperations.Queries.conversations
@@ -37,15 +38,19 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
   const subscribeToNewConversations = () => {
     subscribeToMore({
       document: ConversationOperations.Subscriptions.conversationCreated,
-      updateQuery: (prev, { subscriptionData }) => {
+      updateQuery: (
+        prev,
+        {
+          subscriptionData,
+        }: {
+          subscriptionData: {
+            data: { conversationCreated: ConversationPopulated };
+          };
+        }
+      ) => {
         if (!subscriptionData.data) return prev;
 
-        // @ts-ignore
         const newConversation = subscriptionData.data.conversationCreated;
-
-        console.log("SUB DATA", subscriptionData);
-
-        console.log("PREV CONVERSATIONS", prev);
 
         return Object.assign({}, prev, {
           conversations: [newConversation, ...prev.conversations],
@@ -69,12 +74,12 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
       py={6}
       px={3}
     >
-      {conversationLoading ? (
+      {conversationsLoading ? (
         <SkeletonLoader count={7} height="80px" width="100%" />
       ) : (
         <ConversationList
           session={session}
-          conversations={conversationData?.conversations || []}
+          conversations={conversationsData?.conversations || []}
           onViewConversation={onViewConversation}
         />
       )}

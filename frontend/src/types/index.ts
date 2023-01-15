@@ -33,7 +33,7 @@ export interface ICreateConversationData {
   };
 }
 export interface ICreateConversationInput {
-  participantsIds: Array<string>;
+  participantIds: Array<string>;
 }
 
 /*----------- Conversations ------------*/

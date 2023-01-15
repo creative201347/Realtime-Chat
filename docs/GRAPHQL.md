@@ -7,7 +7,7 @@ import { gql } from "graphql";
 
 const typeDefs = gql`
   type Mutation {
-    createConversation(participantsIds: [String]): CreateConversationResponse
+    createConversation(participantIds: [String]): CreateConversationResponse
   }
 
   type CreateConversationResponse {
@@ -34,7 +34,7 @@ const resolvers = {
   Mutation: {
     createConversation: async (
       _: any,
-      args: { participantsIds: Array<string> },
+      args: { participantIds: Array<string> },
       context: IGraphqlContext
     ) => {
       console.log("CREATE CONVERSATION", args);
@@ -62,8 +62,8 @@ export default {
   Queries: {},
   Mutations: {
     createConversation: gql`
-      mutation CreateConversation($participantsIds: [String]!) {
-        createConversation(participantsIds: $participantsIds) {
+      mutation CreateConversation($participantIds: [String]!) {
+        createConversation(participantIds: $participantIds) {
           conversationId
         }
       }
@@ -80,7 +80,7 @@ interface ICreateConversationData {
   };
 }
 interface ICreateConversationInput {
-  participantsIds: Array<string>;
+  participantIds: Array<string>;
 }
 
 const [createConversation, { loading: createConversationLoading }] =
@@ -89,10 +89,10 @@ const [createConversation, { loading: createConversationLoading }] =
 );
 
 const onCreateConversation = async () => {
-  const participantsIds = [userId, ...participants.map((p) => p.id)];
+  const participantIds = [userId, ...participants.map((p) => p.id)];
   try {
     const { data } = await createConversation({
-      variables: { participantsIds },
+      variables: { participantIds },
     });
   } catch (error: any) {
   }

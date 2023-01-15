@@ -70,10 +70,10 @@ const ConversationModal: React.FC<ConversationModalProps> = ({
   };
 
   const onCreateConversation = async () => {
-    const participantsIds = [userId, ...participants.map((p) => p.id)];
+    const participantIds = [userId, ...participants.map((p) => p.id)];
     try {
       const { data } = await createConversation({
-        variables: { participantsIds },
+        variables: { participantIds },
       });
 
       // console.log("HERE is DATA", data);

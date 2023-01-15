@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { GraphQLError } from "graphql";
 import { withFilter } from "graphql-subscriptions";
 import { ConversationPopulated, IGraphqlContext } from "../../types";
+import { userIsConversationParticipant } from "../../util";
 
 const resolvers = {
   Query: {
@@ -50,11 +51,11 @@ const resolvers = {
   Mutation: {
     createConversation: async (
       _: any,
-      args: { participantsIds: Array<string> },
+      args: { participantIds: Array<string> },
       context: IGraphqlContext
     ): Promise<{ conversationId: string }> => {
       const { session, prisma, pubsub } = context;
-      const { participantsIds } = args;
+      const { participantIds } = args;
 
       if (!session?.user) {
         throw new GraphQLError("Not Authorized");
@@ -69,7 +70,7 @@ const resolvers = {
           data: {
             participants: {
               createMany: {
-                data: participantsIds.map((id) => ({
+                data: participantIds.map((id) => ({
                   userId: id,
                   hasSeenLatestMessage: id === userid,
                 })),
@@ -94,16 +95,11 @@ const resolvers = {
   },
   Subscription: {
     conversationCreated: {
-      // subscribe: (_: any, __: any, context: IGraphqlContext) => {
-      //   const { pubsub } = context;
-      //   return pubsub.asyncIterator(['CONVERSATION_CREATED"']);
-      // },
-      /*----------Filtering Events ------------*/
       subscribe: withFilter(
         (_: any, __: any, context: IGraphqlContext) => {
           const { pubsub } = context;
 
-          return pubsub.asyncIterator(['CONVERSATION_CREATED"']);
+          return pubsub.asyncIterator(["CONVERSATION_CREATED"]);
         },
         (
           payload: IConversationCreatedSubscriptionPayload,
@@ -111,12 +107,18 @@ const resolvers = {
           context: IGraphqlContext
         ) => {
           const { session } = context;
+
+          if (!session?.user) {
+            throw new GraphQLError("Not authorized");
+          }
+
           const {
             conversationCreated: { participants },
           } = payload;
 
-          const userIsParticipant = !!participants.find(
-            (p) => p.userId === session?.user.id
+          const userIsParticipant = userIsConversationParticipant(
+            participants,
+            session.user.id
           );
 
           return userIsParticipant;
