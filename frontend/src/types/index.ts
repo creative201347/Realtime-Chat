@@ -1,4 +1,7 @@
-import { ConversationPopulated } from "../../../backend/src/types";
+import {
+  ConversationPopulated,
+  MessagePopulated,
+} from "../../../backend/src/types";
 
 export interface ICreateUsernameData {
   createUsername: {
@@ -36,4 +39,12 @@ export interface ICreateConversationInput {
 /*----------- Conversations ------------*/
 export interface IConversationsData {
   conversations: Array<ConversationPopulated>;
+}
+
+/*----------- Messages ------------*/
+export interface IMessagesData {
+  messages: Array<MessagePopulated>;
+}
+export interface IMessagesVariables {
+  conversationId: string;
 }

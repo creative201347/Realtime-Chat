@@ -2,6 +2,8 @@ import { Flex } from "@chakra-ui/react";
 import { Session } from "next-auth";
 import { useRouter } from "next/router";
 import MessagesHeader from "./messages/MessageHeader";
+import MessageInput from "./messages/MessageInput";
+import Messages from "./messages/Messages";
 
 interface FeedWrapperProps {
   session: Session;
@@ -14,22 +16,23 @@ const FeedWrapper: React.FC<FeedWrapperProps> = ({ session }) => {
 
   return (
     <Flex
-      width="100%"
-      flexDirection="column"
       display={{ base: conversationId ? "flex" : "none", md: "flex" }}
-      overflow="hidden"
+      direction="column"
+      width="100%"
     >
       {conversationId && typeof conversationId === "string" ? (
-        <Flex
-          direction="column"
-          justify="space-between"
-          overflow="hidden"
-          flexFlow="1"
-          border="1pxsolid red"
-        >
-          <MessagesHeader conversationId={conversationId} userId={userId} />
-          {/* <Messages /> */}
-        </Flex>
+        <>
+          <Flex
+            direction="column"
+            justify="space-between"
+            overflow="hidden"
+            flexGrow={1}
+          >
+            <MessagesHeader conversationId={conversationId} userId={userId} />
+            <Messages conversationId={conversationId} userId={userId} />
+          </Flex>
+          <MessageInput session={session} conversationId={conversationId} />
+        </>
       ) : (
         <div>No Conversation Yet</div>
       )}
