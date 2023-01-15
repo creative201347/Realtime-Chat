@@ -48,3 +48,12 @@ export interface IMessagesData {
 export interface IMessagesVariables {
   conversationId: string;
 }
+
+/*----------- Message Subscription ------------*/
+export interface IMessageSubscriptionData {
+  subscriptionData: {
+    data: {
+      messageSent: MessagePopulated;
+    };
+  };
+}

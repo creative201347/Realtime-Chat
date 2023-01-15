@@ -137,7 +137,7 @@ const resolvers = {
         });
 
         pubsub.publish("MESSAGE_SENT", { messageSent: newMessage });
-        // pubsub.publish("CONERSATION_UPDATED", {
+        // pubsub.publish("CONVERSATION_UPDATED", {
         //   conversationUpdated: { conversation },
         // });
       } catch (error) {
