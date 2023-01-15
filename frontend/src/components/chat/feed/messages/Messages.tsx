@@ -24,10 +24,12 @@ const Messages: React.FC<MessagesProps> = ({ userId, conversationId }) => {
     },
   });
 
+  if (error) return null;
+
   console.log("MESSAGES DATA", data);
   return (
     <Flex direction="column" justify="flex-end" overflow="hidden">
-      {true && (
+      {error && (
         <Stack spacing={4} px={4}>
           <SkeletonLoader count={4} height="60px" width="100%" />
           <span>LOADING MESSAGES...</span>
