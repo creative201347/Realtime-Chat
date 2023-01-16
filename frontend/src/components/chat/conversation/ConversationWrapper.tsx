@@ -3,8 +3,8 @@ import { Session } from "next-auth";
 
 import ConversationList from "./ConversationList";
 import ConversationOperations from "../../../graphql/operations/conversation";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { IConversationsData } from "../../../types";
+import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
+import { IConversationsData, IConversationUpdatedData } from "../../../types";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import SkeletonLoader from "../../common/SkeletonLoader";
@@ -37,6 +37,28 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
   const router = useRouter();
   const { conversationId } = router.query;
   const { id: userId } = session.user;
+
+  useSubscription<IConversationUpdatedData, null>(
+    ConversationOperations.Subscriptions.conversationUpdated,
+    {
+      onData: ({ client, data }) => {
+        const { data: subscriptionData } = data;
+
+        if (!subscriptionData) return;
+
+        const {
+          conversationUpdated: { conversation: updatedConversation },
+        } = subscriptionData;
+
+        const currentlyViewingConversation =
+          updatedConversation.id === conversationId;
+
+        if (currentlyViewingConversation) {
+          onViewConversation(conversationId as string, false);
+        }
+      },
+    }
+  );
 
   const onViewConversation = async (
     conversationId: string,

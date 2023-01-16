@@ -57,3 +57,10 @@ export interface IMessageSubscriptionData {
     };
   };
 }
+
+/*----------- Conversation Subscription ------------*/
+export interface IConversationUpdatedData {
+  conversationUpdated: {
+    conversation: ConversationPopulated;
+  };
+}
