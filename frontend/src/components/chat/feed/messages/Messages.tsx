@@ -11,6 +11,7 @@ import {
   IMessageSubscriptionData,
 } from "../../../../types";
 import SkeletonLoader from "../../../common/SkeletonLoader";
+import MessageItem from "./MessageItem";
 
 interface MessagesProps {
   userId: string;
@@ -63,10 +64,13 @@ const Messages: React.FC<MessagesProps> = ({ userId, conversationId }) => {
         </Stack>
       )}
       {data?.messages && (
-        <Flex direction="column-reverse" height="100%">
+        <Flex direction="column-reverse" height="100%" overflowY="scroll">
           {data.messages.map((message) => (
-            // <MessageItem />
-            <div key={message.id}>{message.body}</div>
+            <MessageItem
+              message={message}
+              sentByMe={message.sender.id === userId}
+              key={message.id}
+            />
           ))}
         </Flex>
       )}
