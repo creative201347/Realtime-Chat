@@ -64,3 +64,8 @@ export interface IConversationUpdatedData {
     conversation: ConversationPopulated;
   };
 }
+export interface IConversationDeletedData {
+  conversationDeleted: {
+    id: string;
+  };
+}

@@ -46,6 +46,14 @@ export type ConversationPopulated = Prisma.ConversationGetPayload<{
 export type ParticipantPopulated = Prisma.ConversationParticipantGetPayload<{
   include: typeof participantPopulated;
 }>;
+export interface IConversationUpdatedSubscriptionPayload {
+  conversationUpdated: {
+    conversation: ConversationPopulated;
+  };
+}
+export interface IConversationDeletedSubscriptionPayload {
+  conversationDeleted: ConversationPopulated;
+}
 
 /*----------- Messages ------------*/
 export interface ISendMessageArguments {
@@ -60,9 +68,3 @@ export interface ISendMessageSentSubscriptionPayload {
 export type MessagePopulated = Prisma.MessageGetPayload<{
   include: typeof messagePopulated;
 }>;
-
-export interface IConversationUpdatedSubscriptionPayload {
-  conversationUpdated: {
-    conversation: ConversationPopulated;
-  };
-}

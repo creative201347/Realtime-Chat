@@ -1,10 +1,13 @@
+import { useMutation } from "@apollo/client";
 import { Box, Text } from "@chakra-ui/react";
 import { Session } from "next-auth";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { toast } from "react-hot-toast";
 import { ConversationPopulated } from "../../../../../backend/src/types";
 import ConversationItem from "./ConversationItem";
 import ConversationModal from "./modal/ConversationModal";
+import ConversationOperations from "../../../graphql/operations/conversation";
 
 interface ConversationListProps {
   session: Session;
@@ -27,6 +30,37 @@ const ConversationList: React.FC<ConversationListProps> = ({
 
   const router = useRouter();
   const { id: userId } = session.user;
+
+  const [deleteConversation] = useMutation<{
+    deleteConversation: boolean;
+    conversationId: string;
+  }>(ConversationOperations.Mutations.deleteConversation);
+
+  const onDeleteConversation = async (conversationId: string) => {
+    try {
+      toast.promise(
+        deleteConversation({
+          variables: {
+            conversationId,
+          },
+          update: () => {
+            router.replace(
+              typeof process.env.NEXT_PUBLIC_BASE_URL === "string"
+                ? process.env.NEXT_PUBLIC_BASE_URL
+                : ""
+            );
+          },
+        }),
+        {
+          loading: "Deleting conversation",
+          success: "Conversation deleted",
+          error: "Failed to delete conversation",
+        }
+      );
+    } catch (error) {
+      console.log("onDeleteConversation error", error);
+    }
+  };
 
   const sortedConversations = [...conversations].sort(
     (a, b) => b.updatedAt.valueOf() - a.updatedAt.valueOf()
@@ -63,6 +97,7 @@ const ConversationList: React.FC<ConversationListProps> = ({
                 participant?.hasSeenLatestMessage
               )
             }
+            onDeleteConversation={onDeleteConversation}
             hasSeenLatestMessage={participant.hasSeenLatestMessage}
             isSelected={conversation.id === router.query.conversationId}
             userId={userId}

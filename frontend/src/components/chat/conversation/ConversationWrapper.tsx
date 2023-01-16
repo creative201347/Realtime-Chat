@@ -4,7 +4,11 @@ import { Session } from "next-auth";
 import ConversationList from "./ConversationList";
 import ConversationOperations from "../../../graphql/operations/conversation";
 import { gql, useMutation, useQuery, useSubscription } from "@apollo/client";
-import { IConversationsData, IConversationUpdatedData } from "../../../types";
+import {
+  IConversationDeletedData,
+  IConversationsData,
+  IConversationUpdatedData,
+} from "../../../types";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import SkeletonLoader from "../../common/SkeletonLoader";
@@ -38,6 +42,35 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
   const { conversationId } = router.query;
   const { id: userId } = session.user;
 
+  const subscribeToNewConversations = () => {
+    subscribeToMore({
+      document: ConversationOperations.Subscriptions.conversationCreated,
+      updateQuery: (
+        prev,
+        {
+          subscriptionData,
+        }: {
+          subscriptionData: {
+            data: { conversationCreated: ConversationPopulated };
+          };
+        }
+      ) => {
+        if (!subscriptionData.data) return prev;
+
+        const newConversation = subscriptionData.data.conversationCreated;
+
+        return Object.assign({}, prev, {
+          conversations: [newConversation, ...prev.conversations],
+        });
+      },
+    });
+  };
+
+  /* ---------- Execute subscription on mount ---------- */
+  useEffect(() => {
+    subscribeToNewConversations();
+  }, []);
+
   useSubscription<IConversationUpdatedData, null>(
     ConversationOperations.Subscriptions.conversationUpdated,
     {
@@ -56,6 +89,35 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
         if (currentlyViewingConversation) {
           onViewConversation(conversationId as string, false);
         }
+      },
+    }
+  );
+  useSubscription<IConversationDeletedData, null>(
+    ConversationOperations.Subscriptions.conversationDeleted,
+    {
+      onData: ({ client, data }) => {
+        const { data: subscriptionData } = data;
+        if (!subscriptionData) return;
+
+        const existing = client.readQuery<IConversationsData>({
+          query: ConversationOperations.Queries.conversations,
+        });
+        if (!existing) return;
+
+        const { conversations } = existing;
+        const { id: deletedConversationId } =
+          subscriptionData.conversationDeleted;
+
+        client.writeQuery<IConversationsData>({
+          query: ConversationOperations.Queries.conversations,
+          data: {
+            conversations: conversations.filter(
+              (conversation) => conversation.id !== deletedConversationId
+            ),
+          },
+        });
+
+        router.push("/");
       },
     }
   );
@@ -135,35 +197,6 @@ const ConversationWrapper: React.FC<ConversationWrapperProps> = ({
       console.log("onViewConversation error", error);
     }
   };
-
-  const subscribeToNewConversations = () => {
-    subscribeToMore({
-      document: ConversationOperations.Subscriptions.conversationCreated,
-      updateQuery: (
-        prev,
-        {
-          subscriptionData,
-        }: {
-          subscriptionData: {
-            data: { conversationCreated: ConversationPopulated };
-          };
-        }
-      ) => {
-        if (!subscriptionData.data) return prev;
-
-        const newConversation = subscriptionData.data.conversationCreated;
-
-        return Object.assign({}, prev, {
-          conversations: [newConversation, ...prev.conversations],
-        });
-      },
-    });
-  };
-
-  /* ---------- Execute subscription on mount ---------- */
-  useEffect(() => {
-    subscribeToNewConversations();
-  }, []);
 
   return (
     <Box

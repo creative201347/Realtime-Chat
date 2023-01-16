@@ -12,6 +12,7 @@
 | [PubSub](https://www.apollographql.com/docs/apollo-server/data/subscriptions#the-pubsub-class)
 | [Filtering events](https://www.apollographql.com/docs/apollo-server/data/subscriptions/#filtering-events)
 | [Optimistic UI](https://www.apollographql.com/docs/react/v2/performance/optimistic-ui/)
+| [Prisma Transactions](https://www.prisma.io/docs/concepts/components/prisma-client/transactions)
 
 
 [Migrating to Apollo V4](https://www.apollographql.com/docs/apollo-server/migration/#migrate-from-apollo-server-express)
