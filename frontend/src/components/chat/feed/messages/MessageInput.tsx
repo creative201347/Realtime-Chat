@@ -7,6 +7,7 @@ import { ObjectID } from "bson";
 
 import { ISendMessageArguments } from "../../../../../../backend/src/types";
 import MessageOperations from "../../../../graphql/operations/message";
+import { IMessagesData } from "../../../../types";
 
 interface MessageInputProps {
   session: Session;
@@ -41,6 +42,41 @@ const MessageInput: React.FC<MessageInputProps> = ({
       const { data, errors } = await sendMessage({
         variables: {
           ...newMessage,
+        },
+
+        //  Optimistically update UI
+        optimisticResponse: {
+          sendMessage: true,
+        },
+        update: (cache) => {
+          setMessageBody("");
+          const existing = cache.readQuery<IMessagesData>({
+            query: MessageOperations.Query.messages,
+            variables: { conversationId },
+          }) as IMessagesData;
+
+          cache.writeQuery<IMessagesData, { conversationId: string }>({
+            query: MessageOperations.Query.messages,
+            variables: { conversationId },
+            data: {
+              ...existing,
+              messages: [
+                {
+                  id: messageId,
+                  body: messageBody,
+                  senderId: session.user.id,
+                  conversationId,
+                  sender: {
+                    id: session.user.id,
+                    username: session.user.username,
+                  },
+                  createdAt: new Date(Date.now()),
+                  updatedAt: new Date(Date.now()),
+                },
+                ...existing.messages,
+              ],
+            },
+          });
         },
       });
 
