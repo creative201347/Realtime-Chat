@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import MessagesHeader from "./messages/MessageHeader";
 import MessageInput from "./messages/MessageInput";
 import Messages from "./messages/Messages";
+import NoConversation from "./NoConversationSelected";
 
 interface FeedWrapperProps {
   session: Session;
@@ -34,7 +35,7 @@ const FeedWrapper: React.FC<FeedWrapperProps> = ({ session }) => {
           <MessageInput session={session} conversationId={conversationId} />
         </>
       ) : (
-        <div>No Conversation Yet</div>
+        <NoConversation />
       )}
     </Flex>
   );
